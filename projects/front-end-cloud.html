@@ -1,0 +1,1094 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Front-end and Cloud Freelancing</title>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #111;
+      color: #f5f5f5;
+      line-height: 1.7;
+    }
+
+    .container {
+      width: min(1100px, 92%);
+      margin: auto;
+      padding: 50px 0;
+    }
+
+    h1,
+    h2,
+    h3 {
+      line-height: 1.2;
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      margin-bottom: 15px;
+    }
+
+    h2 {
+      margin-top: 55px;
+      margin-bottom: 20px;
+    }
+
+    h3 {
+      margin-top: 30px;
+    }
+
+    .intro {
+      max-width: 750px;
+      color: #ccc;
+    }
+
+    .screenshots {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 25px;
+      margin-top: 30px;
+    }
+
+    .screenshot {
+      background: #1a1a1a;
+      padding: 15px;
+      border-radius: 16px;
+    }
+
+    .screenshot img {
+      width: 100%;
+      height: auto;
+      display: block;
+      border-radius: 12px;
+    }
+
+    .screenshot p {
+      margin-bottom: 0;
+      font-weight: bold;
+    }
+
+    .tech {
+      color: #ccc;
+    }
+
+    .code-section {
+      margin-top: 30px;
+    }
+
+    pre {
+      background: #1b1b1b;
+      border: 1px solid #333;
+      padding: 20px;
+      border-radius: 14px;
+      overflow-x: auto;
+      line-height: 1.5;
+      font-size: 0.9rem;
+    }
+
+    code {
+      font-family: Consolas, "Courier New", monospace;
+    }
+
+    .file {
+      margin-top: 35px;
+    }
+
+    .back {
+      display: inline-block;
+      margin-bottom: 30px;
+      color: #fff;
+      text-decoration: none;
+      border: 1px solid #555;
+      padding: 8px 14px;
+      border-radius: 8px;
+    }
+
+    .back:hover {
+      background: #222;
+    }
+
+    footer {
+      margin-top: 60px;
+      padding-top: 25px;
+      border-top: 1px solid #333;
+      color: #aaa;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="container">
+
+    <a class="back" href="../index.html">
+      ← Back to Portfolio
+    </a>
+
+    <h1>Front-end and Cloud Freelancing</h1>
+
+    <p class="intro">
+      A responsive React front-end project built with React and Vite.
+      The project focuses on interactive UI, responsive layouts,
+      dynamic visual themes, animations, and user interaction.
+    </p>
+
+    <h2>Project Screenshots</h2>
+
+    <div class="screenshots">
+
+      <div class="screenshot">
+        <img
+          src="Front-End.jpg.png"
+          alt="Front-end project screenshot"
+        >
+        <p>Front-end Interface</p>
+      </div>
+
+      <div class="screenshot">
+        <img
+          src="Responsive.jpg.png"
+          alt="Responsive design screenshot"
+        >
+        <p>Responsive Design</p>
+      </div>
+
+    </div>
+
+    <h2>Technologies</h2>
+
+    <p class="tech">
+      React, React DOM, JavaScript, JSX, CSS, Vite,
+      responsive design, interactive UI, animations and SVG.
+    </p>
+
+    <h2>React Source Code</h2>
+
+    <!-- App.jsx -->
+    <div class="file">
+
+      <h3>App.jsx</h3>
+
+      <p>
+        Main React application containing the interactive components,
+        dynamic day/night theme, lamp components, collection cards,
+        time controls and waitlist form.
+      </p>
+
+      <pre><code>import { useEffect, useId, useRef, useState } from 'react'
+
+/* ---------- Day theme: colours are interpolated from the hour ---------- */
+
+const KEYS = [
+  { h: 0, bg: [11, 16, 48], glow: [255, 176, 96] },
+  { h: 6, bg: [255, 180, 162], glow: [255, 150, 90] },
+  { h: 12, bg: [205, 232, 255], glow: [255, 255, 255] },
+  { h: 18, bg: [90, 62, 150], glow: [255, 190, 110] },
+  { h: 24, bg: [11, 16, 48], glow: [255, 176, 96] },
+]
+
+const mix = (a, b, t) =&gt; a.map((v, i) =&gt; v + (b[i] - v) * t)
+const rgb = (c) =&gt; `rgb(${c.map(Math.round).join(',')})`
+
+function themeAt(h) {
+  let i = 0
+  while (i &lt; KEYS.length - 2 &amp;&amp; h &gt; KEYS[i + 1].h) i++
+
+  const a = KEYS[i], b = KEYS[i + 1]
+  const t = (h - a.h) / (b.h - a.h)
+
+  const bg = mix(a.bg, b.bg, t)
+  const glow = mix(a.glow, b.glow, t)
+
+  const lum =
+    (0.299 * bg[0] + 0.587 * bg[1] + 0.114 * bg[2]) / 255
+
+  return {
+    bg: rgb(bg),
+    glow: rgb(glow),
+    ink: lum &gt; 0.5 ? '#1b1633' : '#fdf3e3',
+    night: Math.min(1, Math.max(0, (0.7 - lum) / 0.55)),
+  }
+}
+
+const fmt = (h) =&gt; {
+  const m = Math.round((h % 24) * 60) % 1440
+  const hh = Math.floor(m / 60)
+
+  return `${((hh + 11) % 12) + 1}:${String(m % 60).padStart(2, '0')} ${hh &lt; 12 ? 'am' : 'pm'}`
+}
+
+const moment = (h) =&gt;
+  h &lt; 5 ? 'Deep night'
+  : h &lt; 7 ? 'Sunrise'
+  : h &lt; 11 ? 'Morning'
+  : h &lt; 14 ? 'Midday'
+  : h &lt; 17 ? 'Afternoon'
+  : h &lt; 19.5 ? 'Golden hour'
+  : h &lt; 22 ? 'Evening'
+  : 'Night'
+
+/* ---------- Hook: the hour, with an eased tween ---------- */
+
+function useDay() {
+  const [h, setH] = useState(4.5)
+  const hRef = useRef(4.5)
+  const raf = useRef(0)
+
+  const set = (v) =&gt; {
+    hRef.current = v
+    setH(v)
+  }
+
+  const stop = () =&gt; cancelAnimationFrame(raf.current)
+
+  const goTo = (to, ms = 1500) =&gt; {
+    stop()
+
+    const from = hRef.current
+    const t0 = performance.now()
+
+    const step = (t) =&gt; {
+      const p = Math.min(1, (t - t0) / ms)
+      const e =
+        p &lt; 0.5
+          ? 2 * p * p
+          : 1 - Math.pow(-2 * p + 2, 2) / 2
+
+      set(from + (to - from) * e)
+
+      if (p &lt; 1) {
+        raf.current = requestAnimationFrame(step)
+      }
+    }
+
+    raf.current = requestAnimationFrame(step)
+  }
+
+  useEffect(() =&gt; {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      set(17.5)
+      return
+    }
+
+    const t = setTimeout(() =&gt; goTo(17.5, 4500), 500)
+
+    return () =&gt; {
+      clearTimeout(t)
+      stop()
+    }
+  }, [])
+
+  return { h, set, goTo, stop }
+}
+
+/* ---------- Lamp drawing ---------- */
+
+function Lamp({ shape = 'orb', power }) {
+  const id = useId().replace(/:/g, '')
+  const baseX = shape === 'arc' ? 96 : 60
+
+  return (
+    &lt;svg viewBox="0 0 120 170" className="lamp" aria-hidden="true"&gt;
+      &lt;defs&gt;
+        &lt;radialGradient id={id}&gt;
+          &lt;stop offset="0" stopColor="var(--glow)" stopOpacity="0.95" /&gt;
+          &lt;stop offset="1" stopColor="var(--glow)" stopOpacity="0" /&gt;
+        &lt;/radialGradient&gt;
+      &lt;/defs&gt;
+
+      &lt;circle
+        cx="60"
+        cy="62"
+        r={30 + 34 * power}
+        fill={`url(#${id})`}
+        opacity={0.15 + 0.85 * power}
+      /&gt;
+
+      {shape === 'orb' &amp;&amp;
+        &lt;circle cx="60" cy="62" r="30" className="shade" /&gt;}
+
+      {shape === 'cone' &amp;&amp;
+        &lt;path d="M32 92 L48 36 H72 L88 92 Z" className="shade" /&gt;}
+
+      {shape === 'arc' &amp;&amp; (
+        &lt;&gt;
+          &lt;path
+            d="M96 150 C96 60 70 36 44 50"
+            className="stem"
+          /&gt;
+
+          &lt;path
+            d="M24 58 A22 22 0 0 1 68 58 Z"
+            className="shade"
+            transform="rotate(-14 46 58)"
+          /&gt;
+        &lt;/&gt;
+      )}
+
+      {shape !== 'arc' &amp;&amp;
+        &lt;rect
+          x="57"
+          y="92"
+          width="6"
+          height="52"
+          className="ink"
+        /&gt;}
+
+      &lt;ellipse
+        cx={baseX}
+        cy="150"
+        rx="26"
+        ry="7"
+        className="ink"
+      /&gt;
+    &lt;/svg&gt;
+  )
+}
+
+/* ---------- Hero ---------- */
+
+const SCENES = [
+  { n: 'Wake', h: 6.5 },
+  { n: 'Focus', h: 12 },
+  { n: 'Wind down', h: 20.5 },
+]
+
+function Hero({ day, th }) {
+  const { h, set, goTo, stop } = day
+
+  const pos = (hh) =&gt; {
+    const a = ((hh - 6) / 24) * Math.PI * 2
+
+    return {
+      left: `${50 - 42 * Math.cos(a)}%`,
+      top: `${94 - 80 * Math.sin(a)}%`,
+    }
+  }
+
+  const sun = pos(h)
+  const moon = pos((h + 12) % 24)
+
+  return (
+    &lt;section className="hero"&gt;
+
+      &lt;div className="copy"&gt;
+        &lt;h1&gt;Light that keeps your hours.&lt;/h1&gt;
+
+        &lt;p className="lede"&gt;
+          Dayline lamps shift their colour with the time of day,
+          warm at dawn, bright at noon, amber at night.
+          Drag the day below and watch the whole page follow.
+        &lt;/p&gt;
+      &lt;/div&gt;
+
+      &lt;div className="sky" style={{ '--night': th.night }}&gt;
+        &lt;span className="stars" /&gt;
+        &lt;span className="sun" style={sun} /&gt;
+        &lt;span className="moon" style={moon} /&gt;
+        &lt;Lamp shape="orb" power={th.night} /&gt;
+      &lt;/div&gt;
+
+      &lt;div className="controls"&gt;
+
+        &lt;div className="clock" aria-live="off"&gt;
+          &lt;strong&gt;{fmt(h)}&lt;/strong&gt;
+          &lt;span&gt;{moment(h)}&lt;/span&gt;
+        &lt;/div&gt;
+
+        &lt;input
+          className="day"
+          type="range"
+          min="0"
+          max="24"
+          step="0.05"
+          value={h}
+          aria-label="Time of day"
+          onChange={(e) =&gt; {
+            stop()
+            set(+e.target.value)
+          }}
+        /&gt;
+
+        &lt;div className="scenes"&gt;
+          {SCENES.map((s) =&gt; (
+            &lt;button
+              key={s.n}
+              aria-pressed={Math.abs(h - s.h) &lt; 1.5}
+              onClick={() =&gt; goTo(s.h)}
+            &gt;
+              {s.n}
+            &lt;/button&gt;
+          ))}
+        &lt;/div&gt;
+
+      &lt;/div&gt;
+
+    &lt;/section&gt;
+  )
+}
+
+/* ---------- Collection with tilt ---------- */
+
+const LAMPS = [
+  {
+    name: 'Orb',
+    shape: 'orb',
+    note: 'Round and soft. Reads like a small moon on a desk.',
+    k: '2200–6500K',
+    price: '$89',
+  },
+  {
+    name: 'Cone',
+    shape: 'cone',
+    note: 'Throws light down onto the page you are reading.',
+    k: '2700–5000K',
+    price: '$109',
+  },
+  {
+    name: 'Arc',
+    shape: 'arc',
+    note: 'Leans over a sofa or bed without taking floor space.',
+    k: '2000–4000K',
+    price: '$149',
+  },
+]
+
+function Card({ lamp, power }) {
+  const ref = useRef(null)
+
+  const move = (e) =&gt; {
+    const r = ref.current.getBoundingClientRect()
+
+    ref.current.style.setProperty(
+      '--ry',
+      `${((e.clientX - r.left) / r.width - 0.5) * 14}deg`
+    )
+
+    ref.current.style.setProperty(
+      '--rx',
+      `${-((e.clientY - r.top) / r.height - 0.5) * 14}deg`
+    )
+  }
+
+  const reset = () =&gt; {
+    ref.current.style.setProperty('--rx', '0deg')
+    ref.current.style.setProperty('--ry', '0deg')
+  }
+
+  return (
+    &lt;article
+      className="card"
+      ref={ref}
+      onPointerMove={move}
+      onPointerLeave={reset}
+    &gt;
+
+      &lt;Lamp shape={lamp.shape} power={power} /&gt;
+
+      &lt;h3&gt;{lamp.name}&lt;/h3&gt;
+      &lt;p&gt;{lamp.note}&lt;/p&gt;
+
+      &lt;div className="meta"&gt;
+        &lt;span&gt;{lamp.k}&lt;/span&gt;
+        &lt;b&gt;{lamp.price}&lt;/b&gt;
+      &lt;/div&gt;
+
+    &lt;/article&gt;
+  )
+}
+
+/* ---------- Waitlist ---------- */
+
+function Waitlist() {
+  const [email, setEmail] = useState('')
+  const [status, setStatus] = useState('idle')
+
+  const submit = (e) =&gt; {
+    e.preventDefault()
+
+    setStatus(
+      /^\S+@\S+\.\S+$/.test(email)
+        ? 'done'
+        : 'error'
+    )
+  }
+
+  if (status === 'done')
+    return (
+      &lt;div className="done" role="status"&gt;
+
+        &lt;svg viewBox="0 0 52 52" aria-hidden="true"&gt;
+          &lt;circle cx="26" cy="26" r="23" /&gt;
+          &lt;path d="M15 27l8 8 14-17" /&gt;
+        &lt;/svg&gt;
+
+        &lt;p&gt;
+          You are on the list. We will write when the first batch ships.
+        &lt;/p&gt;
+
+      &lt;/div&gt;
+    )
+
+  return (
+    &lt;form onSubmit={submit} noValidate&gt;
+
+      &lt;label htmlFor="em"&gt;Email&lt;/label&gt;
+
+      &lt;div className="row"&gt;
+
+        &lt;input
+          id="em"
+          type="email"
+          value={email}
+          placeholder="you@example.com"
+          onChange={(e) =&gt; {
+            setEmail(e.target.value)
+            setStatus('idle')
+          }}
+          aria-invalid={status === 'error'}
+        /&gt;
+
+        &lt;button type="submit"&gt;
+          Join the waitlist
+        &lt;/button&gt;
+
+      &lt;/div&gt;
+
+      &lt;p className="err" role="alert"&gt;
+        {status === 'error'
+          ? 'Enter a valid email, like you@example.com.'
+          : ''}
+      &lt;/p&gt;
+
+    &lt;/form&gt;
+  )
+}
+
+export default function App() {
+  const day = useDay()
+  const th = themeAt(day.h)
+
+  return (
+    &lt;div
+      className="app"
+      style={{
+        '--bg': th.bg,
+        '--ink': th.ink,
+        '--glow': th.glow
+      }}
+    &gt;
+
+      &lt;header className="top"&gt;
+
+        &lt;a className="logo" href="#top"&gt;
+          Dayline
+        &lt;/a&gt;
+
+        &lt;nav aria-label="Main"&gt;
+          &lt;a href="#collection"&gt;Collection&lt;/a&gt;
+          &lt;a href="#why"&gt;Why&lt;/a&gt;
+          &lt;a href="#waitlist"&gt;Waitlist&lt;/a&gt;
+        &lt;/nav&gt;
+
+      &lt;/header&gt;
+
+      &lt;main id="top"&gt;
+
+        &lt;Hero day={day} th={th} /&gt;
+
+        &lt;section id="collection" className="sec"&gt;
+
+          &lt;h2&gt;Three shapes, one habit&lt;/h2&gt;
+
+          &lt;div className="cards"&gt;
+            {LAMPS.map((l) =&gt; (
+              &lt;Card
+                key={l.name}
+                lamp={l}
+                power={th.night}
+              /&gt;
+            ))}
+          &lt;/div&gt;
+
+        &lt;/section&gt;
+
+        &lt;section id="why" className="sec why"&gt;
+
+          &lt;article&gt;
+            &lt;h3&gt;Follows the sun&lt;/h3&gt;
+            &lt;p&gt;
+              Colour temperature moves with the hour,
+              so evenings stay easy on your eyes.
+            &lt;/p&gt;
+          &lt;/article&gt;
+
+          &lt;article&gt;
+            &lt;h3&gt;No app needed&lt;/h3&gt;
+            &lt;p&gt;
+              One dial on the base. No account, no Wi-Fi,
+              nothing to update.
+            &lt;/p&gt;
+          &lt;/article&gt;
+
+          &lt;article&gt;
+            &lt;h3&gt;Repairable&lt;/h3&gt;
+            &lt;p&gt;
+              Every part is a screw-in module,
+              so one broken piece never means a new lamp.
+            &lt;/p&gt;
+          &lt;/article&gt;
+
+        &lt;/section&gt;
+
+        &lt;section id="waitlist" className="sec wait"&gt;
+
+          &lt;h2&gt;First batch ships in spring&lt;/h2&gt;
+
+          &lt;p&gt;
+            Leave your email and we will tell you the day orders open.
+          &lt;/p&gt;
+
+          &lt;Waitlist /&gt;
+
+        &lt;/section&gt;
+
+      &lt;/main&gt;
+
+      &lt;footer&gt;
+        Dayline is a fictional brand, built as a React front-end exercise.
+      &lt;/footer&gt;
+
+    &lt;/div&gt;
+  )
+}</code></pre>
+
+    </div>
+
+    <!-- main.jsx -->
+    <div class="file">
+
+      <h3>main.jsx</h3>
+
+      <p>
+        React entry point that mounts the App component and loads the
+        global stylesheet.
+      </p>
+
+      <pre><code>import React from 'react'
+import { createRoot } from 'react-dom/client'
+import App from './App.jsx'
+import './index.css'
+
+createRoot(document.getElementById('root')).render(&lt;App /&gt;)</code></pre>
+
+    </div>
+
+    <!-- index.css -->
+    <div class="file">
+
+      <h3>index.css</h3>
+
+      <p>
+        Global styling for the responsive layout, animations,
+        interactive controls, lamps, cards and visual theme.
+      </p>
+
+      <<pre><code>:root { --display: 'Unbounded', system-ui, sans-serif; --body: 'Instrument Sans', system-ui, sans-serif; }
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body { margin: 0; font: 1.05rem/1.6 var(--body); }
+
+.app { min-height: 100vh; background: var(--bg); color: var(--ink); }
+
+a { color: inherit; }
+
+:focus-visible { outline: 3px solid var(--ink); outline-offset: 3px; }
+
+h1, h2, h3 { font-family: var(--display); margin: 0; line-height: 1.1; }
+
+p { max-width: 60ch; }
+
+.top { display: flex; justify-content: space-between; align-items: center; padding: 1.25rem clamp(1rem, 5vw, 4rem); }
+
+.top a { text-decoration: none; font-weight: 500; }
+
+.top nav { display: flex; gap: 1.25rem; }
+
+.top nav a:hover { text-decoration: underline; text-underline-offset: 6px; text-decoration-thickness: 2px; }
+
+.logo { font: 800 1.3rem var(--display); }
+
+.sec { padding: clamp(3rem, 8vw, 6rem) clamp(1rem, 5vw, 4rem); }
+
+/* Hero */
+
+.hero { display: grid; gap: 2rem; padding: 1rem clamp(1rem, 5vw, 4rem) 4rem; grid-template-areas: 'copy' 'sky' 'ctl'; }
+
+.copy { grid-area: copy; }
+.sky { grid-area: sky; }
+.controls { grid-area: ctl; }
+
+@media (min-width: 900px) {
+  .hero { grid-template-columns: 1.1fr 0.9fr; grid-template-areas: 'copy sky' 'ctl sky'; align-items: center; }
+}
+
+h1 { font-size: clamp(2.2rem, 5.6vw, 4.6rem); font-weight: 800; letter-spacing: -0.02em; }
+
+.lede { font-size: 1.2rem; margin: 1.5rem 0 0; }
+
+.sky {
+  position: relative;
+  width: 100%;
+  max-width: 440px;
+  justify-self: center;
+  aspect-ratio: 4 / 5;
+  overflow: hidden;
+  border: 3px solid var(--ink);
+  border-radius: 999px 999px 24px 24px;
+  background: color-mix(in srgb, var(--ink) 10%, var(--bg));
+}
+
+.stars {
+  position: absolute;
+  inset: 0;
+  opacity: var(--night);
+  background:
+    radial-gradient(2px 2px at 20% 18%, var(--ink), transparent),
+    radial-gradient(2px 2px at 72% 12%, var(--ink), transparent),
+    radial-gradient(1.5px 1.5px at 55% 30%, var(--ink), transparent),
+    radial-gradient(2px 2px at 85% 38%, var(--ink), transparent),
+    radial-gradient(1.5px 1.5px at 12% 42%, var(--ink), transparent),
+    radial-gradient(2px 2px at 38% 8%, var(--ink), transparent);
+}
+
+.sun, .moon {
+  position: absolute;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.sun {
+  width: 15%;
+  aspect-ratio: 1;
+  background: #ffd36b;
+  box-shadow: 0 0 50px 14px rgb(255 211 107 / 0.55);
+}
+
+.moon {
+  width: 10%;
+  aspect-ratio: 1;
+  background: #f2f0ff;
+  box-shadow: inset -7px -3px 0 rgb(0 0 0 / 0.18);
+}
+
+.sky::after {
+  content: '';
+  position: absolute;
+  inset: auto 0 0 0;
+  height: 8%;
+  background: var(--ink);
+}
+
+.sky .lamp {
+  position: absolute;
+  z-index: 1;
+  left: 50%;
+  bottom: 5%;
+  width: 62%;
+  transform: translateX(-50%);
+}
+
+.lamp { overflow: visible; }
+
+.lamp .shade {
+  fill: var(--glow);
+  stroke: var(--ink);
+  stroke-width: 3;
+}
+
+.lamp .ink { fill: var(--ink); }
+
+.lamp .stem {
+  fill: none;
+  stroke: var(--ink);
+  stroke-width: 5;
+  stroke-linecap: round;
+}
+
+/* Controls */
+
+.clock {
+  display: flex;
+  align-items: baseline;
+  gap: 1rem;
+  margin-bottom: 0.75rem;
+}
+
+.clock strong { font: 800 2rem var(--display); }
+
+.clock span { font-weight: 500; }
+
+.day {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 18px;
+  border-radius: 999px;
+  border: 3px solid var(--ink);
+  background: linear-gradient(
+    90deg,
+    #0b1030,
+    #ffb4a2 25%,
+    #cde8ff 50%,
+    #5a3e96 75%,
+    #0b1030
+  );
+  cursor: ew-resize;
+}
+
+.day::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: var(--glow);
+  border: 3px solid var(--ink);
+}
+
+.day::-moz-range-thumb {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--glow);
+  border: 3px solid var(--ink);
+}
+
+.scenes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin-top: 1.25rem;
+}
+
+button {
+  font: 600 1rem var(--body);
+  color: inherit;
+  cursor: pointer;
+}
+
+.scenes button {
+  padding: 0.55rem 1.1rem;
+  border-radius: 999px;
+  background: transparent;
+  border: 2px solid var(--ink);
+  transition: background 0.2s, color 0.2s, transform 0.2s;
+}
+
+.scenes button:hover { transform: translateY(-2px); }
+
+.scenes button[aria-pressed='true'] {
+  background: var(--ink);
+  color: var(--bg);
+}
+
+/* Collection */
+
+h2 {
+  font-size: clamp(1.7rem, 4vw, 3rem);
+  margin-bottom: 2rem;
+  max-width: 18ch;
+}
+
+.cards {
+  display: grid;
+  gap: 1.5rem;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+}
+
+.card {
+  padding: 1.5rem;
+  border-radius: 28px 28px 28px 6px;
+  border: 2px solid color-mix(in srgb, var(--ink) 30%, transparent);
+  background: color-mix(in srgb, var(--ink) 8%, transparent);
+  transform: perspective(700px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
+  transition: transform 0.25s ease-out;
+}
+
+.card .lamp {
+  width: 55%;
+  display: block;
+  margin: 0 auto 1rem;
+}
+
+.card h3 {
+  font-size: 1.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.card p { margin: 0 0 1rem; }
+
+.meta {
+  display: flex;
+  justify-content: space-between;
+  font-weight: 500;
+}
+
+.why {
+  display: grid;
+  gap: 2rem;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  border-block: 2px solid color-mix(in srgb, var(--ink) 30%, transparent);
+}
+
+.why h3 {
+  font-size: 1.15rem;
+  margin-bottom: 0.5rem;
+}
+
+.why p { margin: 0; }
+
+/* Waitlist */
+
+.wait h2 { max-width: 16ch; }
+
+label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 0.4rem;
+}
+
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  max-width: 560px;
+}
+
+input[type='email'] {
+  flex: 1 1 240px;
+  padding: 0.9rem 1.1rem;
+  font: inherit;
+  color: inherit;
+  background: transparent;
+  border: 2px solid var(--ink);
+  border-radius: 14px;
+}
+
+input[aria-invalid='true'] { border-style: dashed; }
+
+.row button {
+  padding: 0.9rem 1.5rem;
+  border-radius: 14px;
+  background: var(--ink);
+  color: var(--bg);
+  border: 2px solid var(--ink);
+  transition: transform 0.2s;
+}
+
+.row button:hover { transform: translateY(-3px) rotate(-1deg); }
+
+.err {
+  min-height: 1.6em;
+  margin: 0.6rem 0 0;
+  font-weight: 500;
+}
+
+.done {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.done svg {
+  width: 56px;
+  flex: none;
+  fill: none;
+  stroke: var(--ink);
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.done circle {
+  stroke-dasharray: 150;
+  stroke-dashoffset: 150;
+  animation: draw 0.7s ease-out forwards;
+}
+
+.done path {
+  stroke-dasharray: 40;
+  stroke-dashoffset: 40;
+  animation: draw 0.5s 0.5s ease-out forwards;
+}
+
+@keyframes draw {
+  to { stroke-dashoffset: 0; }
+}
+
+.done p { margin: 0; }
+
+footer {
+  padding: 2rem clamp(1rem, 5vw, 4rem);
+  font-size: 0.95rem;
+  border-top: 2px solid color-mix(in srgb, var(--ink) 30%, transparent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+
+  *, *::before, *::after {
+    transition: none !important;
+    animation: none !important;
+  }
+
+  .done circle, .done path {
+    stroke-dashoffset: 0;
+  }
+}
+</code></pre>
+
+    </div>
+
+    <h2>Project Configuration</h2>
+
+    <div class="file">
+
+      <h3>package.json</h3>
+
+      <pre><code>{
+  "name": "dayline",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.3.1",
+    "vite": "^5.4.0"
+  }
+}</code></pre>
+
+    </div>
+
+    <footer>
+      Dayline is a fictional brand, built as a React front-end exercise.
+    </footer>
+
+  </div>
+
+</body>
+</html>
